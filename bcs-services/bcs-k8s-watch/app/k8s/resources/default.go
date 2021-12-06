@@ -128,6 +128,7 @@ func InitResourceList(k8sConfig *options.K8sConfig, filterConfig *options.Filter
 }
 
 // initKubefedClient init kubefed resources restclient
+//
 func initKubefedClient(restConfig *rest.Config) (map[string]rest.Interface, error) {
 	// create kubefed clientset
 	clientset, err := kubefedClientSet.NewForConfig(restConfig)

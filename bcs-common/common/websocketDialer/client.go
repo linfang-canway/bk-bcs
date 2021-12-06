@@ -42,6 +42,7 @@ func ClientConnect(
 func connectToProxy(
 	rootCtx context.Context, proxyURL string, headers http.Header,
 	tlsConfig *tls.Config, auth ConnectAuthorizer, dialer *websocket.Dialer) error {
+
 	blog.Infof("connecting to proxy %s", proxyURL)
 
 	if dialer == nil {

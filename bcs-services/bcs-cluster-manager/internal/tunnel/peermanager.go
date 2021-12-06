@@ -116,6 +116,7 @@ func getHTTPEndpointFromMeta(node *registry.Node) (string, error) {
 }
 
 // syncPeers sync peers status, add tunnels to new peers, remove tunnels from deleted peers
+// 同步对等点状态，向新对等点添加隧道，从已删除的对等点删除隧道
 func (pm *PeerManager) syncPeers(servs []string) error {
 	if len(servs) == 0 {
 		return fmt.Errorf("syncPeers event can't discovery self")
@@ -125,6 +126,7 @@ func (pm *PeerManager) syncPeers(servs []string) error {
 }
 
 // addRemovePeers add tunnels with new peers each other, remove tunnels from deleted peers
+// 相互添加具有新对等点的隧道，从删除的对等点删除隧道
 func (pm *PeerManager) addRemovePeers(servs []string) {
 	pm.Lock()
 	defer pm.Unlock()

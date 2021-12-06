@@ -29,6 +29,10 @@ import (
 // 1. print log when a request comes in and returns.
 // 2. print request body to log.
 // 3. flow control.
+//MarkProcess执行以下操作：
+// 1. 当请求传入并返回时打印日志。
+// 2. 打印要记录的请求正文。
+// 3. 流量控制。
 func MarkProcess(f restful.RouteFunction) restful.RouteFunction {
 	return func(req *restful.Request, resp *restful.Response) {
 		apiConf := apiserver.GetAPIResource().Conf

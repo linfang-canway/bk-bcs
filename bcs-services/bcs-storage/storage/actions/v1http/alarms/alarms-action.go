@@ -60,7 +60,7 @@ func PostAlarm(req *restful.Request, resp *restful.Response) {
 	const (
 		handler = "PostAlarm"
 	)
-	span := v1http.SetHTTPSpanContextInfo(req, handler)
+	span := v1http.SetHTTPSpanContextInfo(req, handler) // 链路追踪相关
 	defer span.Finish()
 
 	errFunc := func(err error) {

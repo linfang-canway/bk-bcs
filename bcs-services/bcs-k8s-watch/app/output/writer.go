@@ -181,21 +181,28 @@ func (w *Writer) Sync(data *action.SyncData) {
 // distributeNormal distributes normal metadata from queue. The distribute
 // func is invoked by wait.NonSlidingUntil with a stop channel, do not block to
 // recv the queue here in order to make it have runtime to handle the stop channel.
+//distributeNormal从队列分发普通元数据。分发
+//func由wait.nonslidingutil调用，具有停止通道，不阻止
+//在此处重新记录队列，使其具有处理停止通道的运行时。
 func (w *Writer) distributeNormal() {
 	// try to keep reading from queue until there is no more data every period.
 	for {
 		select {
 		case data := <-w.queue:
+			//data.Data
 			metrics.ReportK8sWatchHandlerQueueLengthDec(w.clusterID, NormalQueue)
 			// observe writer queue length
 			if len(w.queue)+1024 > cap(w.queue) {
+				// 写入程序队列正忙，当前任务队列
 				glog.Warnf("Writer queue is busy, current task queue(%d/%d)", len(w.queue), cap(w.queue))
 			} else {
+				// 写入队列接收任务，当前队列
 				glog.V(3).Infof("write queue receive task, current queue(%d/%d)", len(w.queue), cap(w.queue))
 			}
 
 			handlerKey := w.getHandlerKeyBySyncData(data)
 			if handler, ok := w.Handlers[handlerKey]; ok {
+				// 超时重复放入
 				handler.HandleWithTimeout(data, defaultQueueTimeout)
 			} else {
 				glog.Errorf("can't distribute the normal metadata, unknown DataType[%+v]", data.Kind)

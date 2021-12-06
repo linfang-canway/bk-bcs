@@ -32,6 +32,7 @@ import (
 )
 
 // WatcherManager is resource watcher manager.
+//
 type WatcherManager struct {
 	// normal k8s resource watchers.
 	watchers map[string]WatcherInterface
@@ -83,6 +84,7 @@ func (mgr *WatcherManager) initWatchers(clusterID string,
 	}
 
 	// init k8s normal resource watchers
+	// 初始化k8s正常资源监视程序
 	for name, resourceObjType := range resources.WatcherConfigList {
 		watcher := NewWatcher(resourceObjType.Client, name, resourceObjType.ResourceName, resourceObjType.ObjType, mgr.writer, mgr.watchers, resourceObjType.Namespaced) // nolint
 		mgr.watchers[name] = watcher
@@ -98,7 +100,7 @@ func (mgr *WatcherManager) initWatchers(clusterID string,
 	crdInformer.Lister()
 
 	crdInformer.Informer().AddEventHandler(clientGoCache.ResourceEventHandlerFuncs{
-		AddFunc:    mgr.AddEvent,
+		AddFunc:    mgr.AddEvent, // CrdWatcher
 		UpdateFunc: mgr.UpdateEvent,
 		DeleteFunc: mgr.DeleteEvent,
 	})
@@ -115,6 +117,8 @@ func (mgr *WatcherManager) initWatchers(clusterID string,
 	mgr.netserviceWatcher = NewNetServiceWatcher(clusterID, storageService, netservice)
 }
 
+// AddEvent :
+// crdWatcher
 func (mgr *WatcherManager) AddEvent(obj interface{}) {
 	crdObj, ok := obj.(*apiextensionsV1beta1.CustomResourceDefinition)
 	if !ok {
@@ -142,6 +146,8 @@ func (mgr *WatcherManager) DeleteEvent(obj interface{}) {
 }
 
 // runCrdWatcher run a crd watcher and writer handler
+// 运行crd监视程序和写入程序处理程序
+// crd watcher run
 func (mgr *WatcherManager) runCrdWatcher(obj *apiextensionsV1beta1.CustomResourceDefinition) {
 	groupVersion := obj.Spec.Group + "/" + obj.Spec.Version
 	if kubefedClient, ok := resources.CrdClientList[groupVersion]; ok {
@@ -164,11 +170,14 @@ func (mgr *WatcherManager) runCrdWatcher(obj *apiextensionsV1beta1.CustomResourc
 		watcher.stopChan = stopChan
 		mgr.crdWatchers[obj.Spec.Names.Kind] = watcher
 		glog.Infof("watcher manager, start list-watcher[%+v]", obj.Spec.Names.Kind)
+
+		// k8s watcher
 		go watcher.Run(watcher.stopChan)
 	}
 }
 
 // stopCrdWatcher stop watcher and writer handler
+// 停止监视程序和写入程序处理程序
 func (mgr *WatcherManager) stopCrdWatcher(obj *apiextensionsV1beta1.CustomResourceDefinition) {
 
 	if wc, ok := mgr.crdWatchers[obj.Spec.Names.Kind]; ok {
@@ -182,6 +191,7 @@ func (mgr *WatcherManager) stopCrdWatcher(obj *apiextensionsV1beta1.CustomResour
 }
 
 // Run starts the watcher manager, and runs all watchers.
+// 启动监视程序管理器，并运行所有监视程序。
 func (mgr *WatcherManager) Run(stopCh <-chan struct{}) {
 	// run normal resource watchers.
 	for resourceName, watcher := range mgr.watchers {

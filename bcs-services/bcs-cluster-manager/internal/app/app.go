@@ -191,11 +191,12 @@ func (cm *ClusterManager) initModel() error {
 	mongoOptions := &mongo.Options{
 		Hosts:                 strings.Split(cm.opt.Mongo.Address, ","),
 		ConnectTimeoutSeconds: int(cm.opt.Mongo.ConnectTimeout),
-		Database:              cm.opt.Mongo.Database,
-		Username:              cm.opt.Mongo.Username,
-		Password:              password,
+		Database:              "bcs", //cm.opt.Mongo.Database,
+		Username:              "bcs", //cm.opt.Mongo.Username,
+		Password:              "bcs", //password,
 		MaxPoolSize:           uint64(cm.opt.Mongo.MaxPoolSize),
 		MinPoolSize:           uint64(cm.opt.Mongo.MinPoolSize),
+		AuthDatabase:          "bcs",
 	}
 	mongoDB, err := mongo.NewDB(mongoOptions)
 	if err != nil {

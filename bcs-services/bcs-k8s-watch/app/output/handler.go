@@ -78,6 +78,7 @@ func (h *Handler) Handle(data *action.SyncData) {
 }
 
 // HandleWithTimeout sends the metadata into handler queue with timeout.
+//HandleWithTimeout将元数据发送到具有超时的处理程序队列中。
 func (h *Handler) HandleWithTimeout(data *action.SyncData, timeout time.Duration) {
 	select {
 	case h.queue <- data:
@@ -103,6 +104,8 @@ func (h *Handler) reportHandlerQueueLength() {
 
 // handle func is invoked by wait.NonSlidingUntil with a stop channel, do not block
 // to recv the queue here in order to make it have runtime to handle the stop channel.
+//handle func由wait.nonslidingutil调用，具有停止通道，请勿阻塞
+//在此处接收队列，使其具有处理停止通道的运行时。
 func (h *Handler) handle() {
 	// try to keep reading from queue until there is no more data every period.
 	for {

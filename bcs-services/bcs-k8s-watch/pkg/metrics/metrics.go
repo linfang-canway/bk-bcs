@@ -33,11 +33,13 @@ const (
 
 var (
 	// bcs-k8s-watch request action metrics
+	// bcs存储api的请求总数
 	requestTotalAPI = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: BkBcsK8sWatch,
 		Name:      "storage_request_total_num",
 		Help:      "The total num of requests for bcs-storage api",
 	}, []string{"cluster_id", "handler", "namespace", "resource_type", "method", "status"})
+	// bcs存储api的api请求延迟统计信息
 	requestLatencyAPI = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: BkBcsK8sWatch,
 		Name:      "storage_request_latency_time",

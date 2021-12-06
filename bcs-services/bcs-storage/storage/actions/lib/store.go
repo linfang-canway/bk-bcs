@@ -559,16 +559,20 @@ func watchMatch(data, cond operator.M) bool {
 
 // Watch watch some resource type
 func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchOption) (chan *Event, error) {
+
+	// resourceType ： tableName
+
 	const (
 		OperationName   = "storage-Watch"
 		OperationMethod = "Watch"
 	)
-	span, ctx := utils.StartSpanFromContext(ctx, OperationName)
-	setDBSpanTags(a, span, resourceType, OperationMethod)
+	span, ctx := utils.StartSpanFromContext(ctx, OperationName) // 链路追踪相关
+	setDBSpanTags(a, span, resourceType, OperationMethod)       // 注册链路追踪相关tag
 
 	id := uuid.New().String()
 	utils.SetSpanCommonTag(span, "uuid", id)
 
+	// 订阅
 	dbEvent := make(chan *drivers.WatchEvent, 100)
 	err := a.eventBus.Subscribe(resourceType, id, dbEvent)
 	if err != nil {
@@ -579,6 +583,7 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 	retEvent := make(chan *Event, 100)
 	go func() {
 		defer span.Finish()
+		// 取消订阅
 		defer a.eventBus.Unsubscribe(resourceType, id)
 		eventCounter := 0
 		for {
@@ -598,6 +603,7 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 						}
 					}
 				}
+
 				switch e.Type {
 				case drivers.EventAdd:
 					retEvent <- &Event{
@@ -606,8 +612,10 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 					}
 				case drivers.EventUpdate:
 					// send delete event when doing soft delete and meeting delete flag
+					// 执行软删除和会议删除标志时发送删除事件
 					if a.doSoftDelete {
-						if deleteFlagValue, ok := e.UpdatedFields[databaseFieldNameForDeletionFlag]; ok {
+						deleteFlagValue, ok := e.UpdatedFields[databaseFieldNameForDeletionFlag]
+						if ok {
 							deleteFlag, assertOk := deleteFlagValue.(bool)
 							if assertOk && deleteFlag {
 								retEvent <- &Event{
@@ -623,6 +631,7 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 					}
 				case drivers.EventDelete:
 					// ignore delete event when doing soft delete
+					// 执行软删除时忽略删除事件
 					if a.doSoftDelete {
 						continue
 					}
@@ -635,6 +644,7 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 						Type:  Brk,
 						Value: e.Data,
 					}
+					// 关闭！！！！
 					return
 				default:
 					retEvent <- &Event{
@@ -642,6 +652,8 @@ func (a *Store) Watch(ctx context.Context, resourceType string, opt *StoreWatchO
 						Value: e.Data,
 					}
 				}
+
+				// 超出最大限制
 				eventCounter++
 				if opt.MaxEvents != 0 {
 					if uint(eventCounter) >= opt.MaxEvents {

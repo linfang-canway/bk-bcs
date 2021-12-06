@@ -559,6 +559,8 @@ func isExistResourceQueue(features map[string]string) bool {
 	return true
 }
 
+// TODO ： Header 会记录哪些值，包括event和alarm吗？
+// 出队列的个数
 func publishDynamicResourceToQueue(data operator.M, featTags []string, event msgqueue.EventKind) error {
 	var (
 		err     error

@@ -62,9 +62,9 @@ func main() {
 	// mongo config
 	flag.String("mongo_address", "127.0.0.1:27017", "mongo server address")
 	flag.Uint("mongo_connecttimeout", 3, "mongo server connnect timeout")
-	flag.String("mongo_database", "", "database in mongo for cluster manager")
-	flag.String("mongo_username", "", "mongo username for cluster manager")
-	flag.String("mongo_password", "", "mongo passsword for cluster manager")
+	flag.String("mongo_database", "clustermanager", "database in mongo for cluster manager")
+	flag.String("mongo_username", "clustermanager", "mongo username for cluster manager")
+	flag.String("mongo_password", "clustermanager", "mongo passsword for cluster manager")
 	flag.Uint("mongo_maxpoolsize", 0, "mongo client connection pool max size, 0 means not set")
 	flag.Uint("mongo_minpoolsize", 0, "mongo client connection pool min size, 0 means not set")
 	// config file path

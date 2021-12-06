@@ -45,11 +45,13 @@ var (
 	}, []string{"handler", "table"})
 
 	// queue push data metrics
+	// 队列上传指标
 	queuePushTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: BkBcsStorage,
 		Name:      "queue_push_total",
 		Help:      "the total number of queue push data",
 	}, []string{"name", "status"})
+	// 推送操作延迟统计信息
 	queuePushLatency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: BkBcsStorage,
 		Name:      "queue_latency_seconds",
@@ -88,6 +90,6 @@ func ReportQueuePushMetrics(name string, err error, started time.Time) {
 	if err != nil {
 		status = pushStatusFail
 	}
-	queuePushTotal.WithLabelValues(name, status).Inc()
-	queuePushLatency.WithLabelValues(name, status).Observe(time.Since(started).Seconds())
+	queuePushTotal.WithLabelValues(name, status).Inc()                                    // push数量
+	queuePushLatency.WithLabelValues(name, status).Observe(time.Since(started).Seconds()) // push延时
 }

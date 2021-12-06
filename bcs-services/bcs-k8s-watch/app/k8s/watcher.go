@@ -43,27 +43,36 @@ import (
 
 const (
 	// defaultWatcherQueueTime for watcher queue metrics collect
+	// 收集观察者队列度量的defaultWatcherQueueTime
 	defaultWatcherQueueTime = 3 * time.Second
 
 	// defaultSyncInterval is default sync interval.
+	// defaultSyncInterval是默认的同步间隔。
 	defaultSyncInterval = 30 * time.Second
 
 	// defaultNetServiceTimeout is default netservice timeout.
 	defaultNetServiceTimeout = 20 * time.Second
 
 	// defaultHTTPRetryerCount is default http request retry count.
+	// 默认http请求重复次数
 	defaultHTTPRetryerCount = 2
 
 	// defaultHTTPRetryerTime is default http request retry time.
+	// 默认http请求重复间隔
 	defaultHTTPRetryerTime = time.Second
 )
 
+//监视程序从k8s群集监视目标类型资源元数据，
+//并通过同步器以串联动作写入存储器
 // Watcher watchs target type resource metadata from k8s cluster,
-// and write to storage by synchronizer with series actions.
+// and write to storage by synchronizer with series actions.\
+
+// NOTE : netServiceWatcher
+//sharedWatchers -> netServiceWatcher
 type Watcher struct {
-	resourceType       string
-	resourceNamespaced bool
-	queue              *queue.Queue
+	resourceType       string       // 资源类型
+	resourceNamespaced bool         //
+	queue              *queue.Queue // 队列
 	controller         cache.Controller
 	store              cache.Store
 	writer             *output.Writer
@@ -112,16 +121,21 @@ func (w *Watcher) ListKeys() []string {
 }
 
 // Run starts the watcher.
+// k8s watcher run
 func (w *Watcher) Run(stopCh <-chan struct{}) {
 	// do with handler data
+	// 同步数据
 	go w.handleQueueData(stopCh)
 
 	// metrics collect watcher fifo queue length
+	// 度量收集观察者fifo队列长度
+	// 指标 队列长度
 	go wait.NonSlidingUntil(func() {
 		metrics.ReportK8sWatcherQueueLength(w.resourceType, float64(w.queue.Length()))
 	}, time.Second*1, stopCh)
 
 	// metrics collect watcher cache keys length
+	// 指标 缓存key长度
 	go wait.NonSlidingUntil(func() {
 		metrics.ReportK8sWatcherCacheKeys(w.resourceType, float64(len(w.ListKeys())))
 	}, time.Second*1, stopCh)
@@ -200,6 +214,7 @@ func (w *Watcher) UpdateEvent(oldObj, newObj interface{}) {
 			newNode.Status.Conditions[i].LastHeartbeatTime = oldNode.Status.Conditions[i].LastHeartbeatTime
 		}
 
+		// 第一个DeepEqual在obj级别跳过，第二个DeepEqual跳过,保存公共字段后的节点数据。
 		// the first DeepEqual skips in obj level, the second DeepEqual skips
 		// the node data after save common fields.
 		if reflect.DeepEqual(oldNode, newNode) {
@@ -208,6 +223,7 @@ func (w *Watcher) UpdateEvent(oldObj, newObj interface{}) {
 		}
 
 		// recover new node metadata after DeepEqual finally.
+		// 最终在DeepEqual之后恢复新节点元数据。
 		newNode.ResourceVersion = tempVersion
 		for i := range newNode.Status.Conditions {
 			newNode.Status.Conditions[i].LastHeartbeatTime = tempLastTimes[i]
@@ -215,6 +231,7 @@ func (w *Watcher) UpdateEvent(oldObj, newObj interface{}) {
 	}
 
 	// it's need to update finally, sync metadata now.
+	// 最后需要更新，现在就同步元数据。
 	data := w.genSyncData(newObj, action.SyncDataActionUpdate)
 	if data == nil {
 		return
@@ -223,7 +240,14 @@ func (w *Watcher) UpdateEvent(oldObj, newObj interface{}) {
 }
 
 // isEventShouldFilter filters k8s system events.
+// 过滤出系统事件
+// delete、event true
+//
+//
+//
 func (w *Watcher) isEventShouldFilter(meta metav1.Object, eventAction string) bool {
+	//注意：事件不支持删除
+	//此处的错误修复：如果名称或命名空间返回true，则必须位于此func的顶部。
 	// NOTE: event not support delete
 	// bugfix here: must in top of this func, in case of Name or Namespace return true.
 	if eventAction == action.SyncDataActionDelete && w.resourceType == ResourceTypeEvent {
@@ -268,18 +292,20 @@ func (w *Watcher) genSyncData(obj interface{}, eventAction string) *action.SyncD
 	ownerUID := ""
 	glog.Infof("Ready to sync: %s %s: %s/%s", eventAction, w.resourceType, namespace, name)
 	syncData := &action.SyncData{
-		Kind:      w.resourceType,
-		Namespace: namespace,
-		Name:      name,
-		Action:    eventAction,
-		Data:      obj,
-		OwnerUID:  ownerUID,
+		Kind:       w.resourceType,
+		Namespace:  namespace,
+		Name:       name,
+		Action:     eventAction,
+		Data:       obj,
+		OwnerUID:   ownerUID,
+		CreateTime: time.Now(),
 	}
 
 	return syncData
 }
 
 // NetServiceWatcher watchs resources in netservice, and sync to storage.
+// NetServiceWatcher监视netservice中的资源，并同步到存储。
 type NetServiceWatcher struct {
 	clusterID      string
 	storageService *bcs.InnerService
@@ -314,6 +340,7 @@ func (w *NetServiceWatcher) httpClient(httpConfig *bcs.HTTPClientConfig) (*goreq
 	return request, nil
 }
 
+// 通过 netservice 查询ip详细信息
 func (w *NetServiceWatcher) queryIPResource() (*netservicetypes.NetResponse, error) {
 	targets := w.netservice.Servers()
 	serversCount := len(targets)
@@ -393,6 +420,7 @@ func (w *NetServiceWatcher) queryIPResourceDetail() (*netservicetypes.NetRespons
 }
 
 // SyncIPResource syncs target ip resources to storages.
+// 将目标ip资源同步到存储。
 func (w *NetServiceWatcher) SyncIPResource() {
 	// query resource from netservice.
 	resource, err := w.queryIPResource()
@@ -402,6 +430,7 @@ func (w *NetServiceWatcher) SyncIPResource() {
 	}
 
 	// only sync ip pool static information.
+	// 仅同步静态资源池资源
 	if resource.Type != netservicetypes.ResponseType_PSTATIC {
 		glog.Warnf("sync netservice ip resource, query from netservice, invalid response type[%+v]", resource.Type)
 		return
@@ -409,15 +438,17 @@ func (w *NetServiceWatcher) SyncIPResource() {
 
 	// sync ip resource.
 	metadata := &action.SyncData{
-		Name:   "IPPoolStatic-" + w.clusterID,
-		Kind:   "IPPoolStatic",
-		Action: action.SyncDataActionUpdate,
-		Data:   resource.Data,
+		Name:       "IPPoolStatic-" + w.clusterID,
+		Kind:       "IPPoolStatic",
+		Action:     action.SyncDataActionUpdate,
+		Data:       resource.Data,
+		CreateTime: time.Now(),
 	}
 	w.action.Update(metadata)
 }
 
 // SyncIPResourceDetail syncs target ip resource detail to storages.
+// 将目标ip资源详细信息同步到存储。
 func (w *NetServiceWatcher) SyncIPResourceDetail() {
 	// query resource detail from netservice.
 	resource, err := w.queryIPResourceDetail()
@@ -443,6 +474,7 @@ func (w *NetServiceWatcher) SyncIPResourceDetail() {
 }
 
 // Run starts the netservice watcher.
+// netService watcher run
 func (w *NetServiceWatcher) Run(stopCh <-chan struct{}) {
 	// sync ip resource.
 	go wait.NonSlidingUntil(w.SyncIPResource, defaultSyncInterval*2, stopCh)

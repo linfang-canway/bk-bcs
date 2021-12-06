@@ -33,6 +33,8 @@ func GetStorageService(zkHosts string, bcsTLSConfig bcsoptions.TLS, customIPStr 
 }
 
 // GetNetService returns netservice InnerService object for discovery.
+// 返回用于查找的netservice InnerService对象。
+// 在zk中查找对应的netservice
 func GetNetService(zkHosts string, bcsTLSConfig bcsoptions.TLS, customIPStr string, isExternal bool) (*InnerService, *RegisterDiscover.RegDiscover, error) {
 	discovery := RegisterDiscover.NewRegDiscoverEx(zkHosts, 5*time.Second)
 	if err := discovery.Start(); err != nil {

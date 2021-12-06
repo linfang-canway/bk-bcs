@@ -36,7 +36,6 @@ func Run() error {
 	if err != nil {
 		return fmt.Errorf("error getting k8s cluster config: %s", err.Error())
 	}
-
 	if kubeconfig == "" {
 		// since go-client 9.0.0, the restclient.Config returned by BuildConfigFromFlags doesn't have BearerToken, so manually get the BearerToken
 		token, err := ioutil.ReadFile(tokenFile)
@@ -55,6 +54,7 @@ func Run() error {
 		return fmt.Errorf("error building kubernetes clientset: %s", err.Error())
 	}
 
+	// 使用Websocket注册
 	useWebsocket := viper.GetBool("agent.use-websocket")
 	if useWebsocket {
 		err := buildWebsocketToBke(cfg)
@@ -62,6 +62,7 @@ func Run() error {
 			return err
 		}
 	} else {
+		// 把节点信息上报给api gateway
 		go reportToBke(kubeClient, cfg)
 	}
 

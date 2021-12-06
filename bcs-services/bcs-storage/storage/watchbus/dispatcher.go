@@ -74,6 +74,7 @@ func (eb *EventBus) createListener(topic string) (chan *drivers.WatchEvent, erro
 }
 
 // Subscribe subscribe event for certain topic, here topic is database table
+// 订阅特定主题的订阅事件，这里的主题是数据库表
 func (eb *EventBus) Subscribe(topic, uuid string, ch chan *drivers.WatchEvent) error {
 	eb.sublock.Lock()
 	defer eb.sublock.Unlock()

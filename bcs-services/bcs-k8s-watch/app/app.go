@@ -168,6 +168,7 @@ func RunAsLeader(stopChan <-chan struct{}, config *options.WatchConfig, clusterI
 		}
 	}()
 
+	// 指标
 	bcs.RunPrometheusMetricsServer(config)
 	glog.Info("start http server successful")
 

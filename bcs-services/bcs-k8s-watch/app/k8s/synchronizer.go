@@ -59,10 +59,12 @@ func NewSynchronizer(clusterID string, watchers, crdWatchers map[string]WatcherI
 }
 
 // Run starts the Synchronizer and make it keep sync resources in period.
+// 启动同步器并使其在周期内保持同步资源。
 func (sync *Synchronizer) Run(stopCh <-chan struct{}) {
 	glog.Info("synchronizer waiting for watchers to be ready")
 
 	for {
+		// 间隔时间
 		time.Sleep(defaultWatcherCheckInterval)
 
 		select {
@@ -90,18 +92,22 @@ func (sync *Synchronizer) Run(stopCh <-chan struct{}) {
 
 		namespaces := sync.watchers["Namespace"].(*Watcher).store.ListKeys()
 
+		// 同步config
 		for resourceType, resourceObjType := range resources.WatcherConfigList {
 			if resourceObjType.Namespaced {
+				// 同步 namespace 资源
 				glog.Info("begin to sync %s", resourceType)
 				sync.syncNamespaceResource(resourceType, namespaces, sync.watchers[resourceType].(*Watcher))
 				glog.Info("sync %s done", resourceType)
 			} else {
+				// 同步集群资源
 				glog.Info("begin to sync %s", resourceType)
 				sync.syncClusterResource(resourceType, sync.watchers[resourceType].(*Watcher))
 				glog.Info("sync %s done", resourceType)
 			}
 		}
 
+		// 同步crd数据
 		for resourceType, watcher := range sync.crdWatchers {
 			w := watcher.(*Watcher)
 			if !w.controller.HasSynced() {
@@ -247,14 +253,16 @@ func (sync *Synchronizer) doSync(localKeys []string, data []map[string]string, w
 				glog.Infof("sync: %s: %s (name=%s) not on local, do delete", watcher.resourceType, key, name)
 
 				syncData := &action.SyncData{
-					Kind:      watcher.resourceType,
-					Namespace: namespace,
-					Name:      name,
-					Action:    action.SyncDataActionDelete,
-					Data:      "",
+					Kind:       watcher.resourceType,
+					Namespace:  namespace,
+					Name:       name,
+					Action:     action.SyncDataActionDelete,
+					Data:       "",
+					CreateTime: time.Now(),
 				}
 
 				// sync delete event base on the reconciliation logic.
+				//
 				watcher.writer.Sync(syncData)
 			}
 		}
@@ -262,12 +270,14 @@ func (sync *Synchronizer) doSync(localKeys []string, data []map[string]string, w
 }
 
 // get resource from storage, namespace can be empty.
+// 从存储中获取资源，命名空间可以为空。
 func (sync *Synchronizer) doRequest(namespace string, kind string) (data []interface{}, err error) {
 	targets := sync.storageService.Servers()
 	serversCount := len(targets)
 
 	if serversCount == 0 {
 		// the process get address from zk not finished yet or there is no storage server on zk.
+		// 从zk获取地址的过程尚未完成，或者zk上没有存储服务器。
 		err = fmt.Errorf("storage server list is empty, got no address yet")
 		glog.Errorf(err.Error())
 		return

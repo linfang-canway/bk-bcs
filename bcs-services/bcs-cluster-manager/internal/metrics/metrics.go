@@ -30,11 +30,23 @@ const (
 )
 
 var (
+	// 最小
+	temp = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace:   "",
+		Subsystem:   "",
+		Name:        "",
+		Help:        "",
+		ConstLabels: nil,
+		Buckets:     []float64{},
+	}, []string{""})
+
+	// 调用其他服务api总数
 	requestsTotalLib = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: BkBcsClusterManager,
 		Name:      "lib_request_total_num",
 		Help:      "The total number of requests for cluster manager to call other system api",
 	}, []string{"system", "handler", "method", "status"})
+	// 调用其他服务延迟
 	requestLatencyLib = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: BkBcsClusterManager,
 		Name:      "lib_request_latency_time",
@@ -42,11 +54,13 @@ var (
 		Buckets:   []float64{0.01, 0.1, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0},
 	}, []string{"system", "handler", "method", "status"})
 
+	// api请求统计
 	requestsTotalAPI = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: BkBcsClusterManager,
 		Name:      "api_request_total_num",
 		Help:      "The total number of requests for cluster manager api",
 	}, []string{"handler", "method", "status"})
+	// api请求延迟时间
 	requestLatencyAPI = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: BkBcsClusterManager,
 		Name:      "api_request_latency_time",
@@ -70,6 +84,7 @@ func ReportLibRequestMetric(system, handler, method, status string, started time
 
 // ReportAPIRequestMetric report api request metrics
 func ReportAPIRequestMetric(handler, method, status string, started time.Time) {
+	temp.WithLabelValues().Observe(1)
 	requestsTotalAPI.WithLabelValues(handler, method, status).Inc()
 	requestLatencyAPI.WithLabelValues(handler, method, status).Observe(time.Since(started).Seconds())
 }

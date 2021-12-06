@@ -62,6 +62,7 @@ func reportToBke(kubeClient *kubernetes.Clientset, cfg *rest.Config) {
 	monitorTicker := time.NewTicker(time.Duration(periodSync) * time.Second)
 	defer monitorTicker.Stop()
 	for {
+		// 获取apiservice地址
 		serverAddresses, err := getApiserverAdresses(kubeClient)
 		if err != nil {
 			blog.Errorf("Error getting apiserver addresses of cluster: %s", err.Error())
@@ -117,6 +118,9 @@ func reportToBke(kubeClient *kubernetes.Clientset, cfg *rest.Config) {
 			Set("Authorization", "Bearer "+userToken).
 			Send(clusterInfoParams).End()
 		if len(errs) > 0 {
+			for _, err2 := range errs {
+				err2.Error()
+			}
 			blog.Errorf("unable to connect to the bke server: %s", errs[0].Error())
 			reportBcsKubeAgentAPIMetrics(handler, method, FailConnect, start)
 			// sleep a while to try again, avoid trying in loop
@@ -139,6 +143,7 @@ func reportToBke(kubeClient *kubernetes.Clientset, cfg *rest.Config) {
 			reportBcsKubeAgentAPIMetrics(handler, method, fmt.Sprintf("%d", codeName), start)
 		}
 
+		// 超时退出
 		select {
 		case <-monitorTicker.C:
 		}
@@ -199,12 +204,14 @@ func getApiserverAdresses(kubeClient *kubernetes.Clientset) (string, error) {
 			if err != nil {
 				return "", err
 			}
+			// 逐个注册node
 			for _, node := range masterNodes {
 				nodeIP, err := getNodeInternalIP(node)
 				if err != nil {
 					blog.Warnf("get node internal ip failed, err %s", err.Error())
 					continue
 				}
+				// 探针
 				err = pingEndpoint(net.JoinHostPort(nodeIP, strconv.Itoa(int(apiserverPort))))
 				if err == nil {
 					endpoint := "https://" + net.JoinHostPort(nodeIP, strconv.Itoa(int(apiserverPort)))
@@ -236,6 +243,7 @@ func getBkeAgentInfo() string {
 }
 
 // probe the health of the apiserver address for 3 times
+// 探测apiserver地址的运行状况3次
 func pingEndpoint(host string) error {
 	var err error
 	for i := 0; i < 3; i++ {

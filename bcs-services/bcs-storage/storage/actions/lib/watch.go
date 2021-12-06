@@ -89,6 +89,7 @@ func (ws *WatchServer) Go(ctx context.Context) {
 	}
 
 	// metrics
+	// watch请求总数
 	metrics.ReportWatchRequestInc(ws.req.SelectedRoutePath(), ws.tableName)
 
 	notify := ws.resp.CloseNotify()
@@ -107,10 +108,12 @@ func (ws *WatchServer) Go(ctx context.Context) {
 
 	defer func() {
 		blog.Infof(ws.sprint("watch end"))
+		//
 		metrics.ReportWatchRequestDec(ws.req.SelectedRoutePath(), ws.tableName)
 		ws.Writer(ws.resp, EventWatchBreak)
 		ws.resp.ResponseWriter.(http.Flusher).Flush()
 	}()
+
 	event, err := ws.store.Watch(ctx, ws.tableName, watchOption)
 	if err != nil {
 		blog.Errorf("watch failed, err %s", err.Error())
@@ -127,13 +130,15 @@ func (ws *WatchServer) Go(ctx context.Context) {
 			return
 		case e := <-event:
 			if e.Type == Brk {
+				// -1 退出信号
 				blog.Infof(ws.sprint("stop watch by event break"))
 				return
 			}
 			if ws.Writer(ws.resp, e) {
 				blog.V(5).Infof(ws.sprint(fmt.Sprintf("flush: %v", e)))
 			}
-			ws.resp.ResponseWriter.(http.Flusher).Flush()
+			ws.resp.ResponseWriter.(http.Flusher).Flush() // 发送请求
+			// 接口响应大小
 			metrics.ReportWatchHTTPResponseSize(ws.req.SelectedRoutePath(), ws.tableName, int64(ws.resp.ContentLength()))
 		}
 	}

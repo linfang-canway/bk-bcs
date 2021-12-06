@@ -23,19 +23,28 @@ import (
 // Config has the dependencies and values of the recorder.
 type Config struct {
 	// Prefix is the prefix that will be set on the metrics, by default it will be empty.
+	//Prefix是将在指标上设置的前缀，默认情况下为空。
 	Prefix string
 	// DurationBuckets are the buckets used by Prometheus for the HTTP request duration metrics,
 	// by default uses Prometheus default buckets (from 5ms to 10s).
+	//DurationBucket是Prometheus用于HTTP请求持续时间度量的Bucket，
+	//默认情况下，使用普罗米修斯默认存储桶（从5秒到10秒）。
 	DurationBuckets []float64
 	// SizeBuckets are the buckets used by Prometheus for the HTTP response size metrics,
 	// by default uses a exponential buckets from 100B to 1GB.
+	//SizeBuckets是Prometheus用于HTTP响应大小度量的存储桶，
+	//默认情况下，使用从100B到1GB的指数存储桶。
 	SizeBuckets []float64
 	// Registry is the registry that will be used by the recorder to store the metrics,
 	// if the default registry is not used then it will use the default one.
+	//注册表是记录器用于存储度量的注册表，
+	//如果未使用默认注册表，则将使用默认注册表。
 	Registry prometheus.Registerer
 	// HandlerIDLabel is the name that will be set to the handler ID label, by default is `handler`.
+	//HandlerIDLabel是将设置为处理程序ID标签的名称，默认情况下为“handler”。
 	HandlerIDLabel string
 	// StatusCodeLabel is the name that will be set to the status code label, by default is `code`.
+	//StatusCodeLabel是将设置为状态代码标签的名称，默认情况下为“code”。
 	StatusCodeLabel string
 	// MethodLabel is the name that will be set to the method label, by default is `method`.
 	MethodLabel string
@@ -112,6 +121,7 @@ func NewRecorder(cfg Config) Recorder {
 			Buckets:   cfg.SizeBuckets,
 		}, []string{cfg.HandlerIDLabel, cfg.MethodLabel, cfg.StatusCodeLabel}),
 
+		// 正在处理的请求数量
 		httpRequestsInflight: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: cfg.Prefix,
 			Name:      "api_requests_inflight",

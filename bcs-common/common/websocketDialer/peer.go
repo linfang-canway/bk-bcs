@@ -48,7 +48,6 @@ func (s *Server) AddPeer(url, id, token string, cliTLS *tls.Config) {
 		cliTLS: cliTLS,
 		cancel: cancel,
 	}
-
 	blog.Infof("Adding peer %s, %s", url, id)
 
 	s.peerLock.Lock()
