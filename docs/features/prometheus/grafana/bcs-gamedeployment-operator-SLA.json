@@ -8,20 +8,25 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 36,
-  "iteration": 1652426246755,
+  "id": 16,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -34,18 +39,17 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -78,9 +82,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
           "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\"} or bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\"})/sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{} or  bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\"})",
           "hide": false,
           "interval": "",
@@ -89,27 +98,24 @@
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "GamestatefulSet变更成功率",
+      "title": "GameDeployment变更成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -142,35 +148,37 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\",name=~\"$name\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{,name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{}) ",
           "hide": false,
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "创建Pod成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -203,33 +211,35 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\"}) ",
           "hide": false,
           "interval": "",
           "legendFormat": "",
           "refId": "B"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "删除Pod成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -262,32 +272,34 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
           "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",le=\"10\"} or bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{} or bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "GamestatefulSet变更生效时间<10s",
+      "title": "GameDeployment变更生效时间<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -320,32 +332,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",name=~\"$name\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{,name=~\"$name\"})  ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",le=\"10\"})/sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{}) ",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "创建pod生效时间<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
+      "datasource": {},
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -378,23 +393,25 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",name=~\"$name\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\"}) ",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "{{namespace}}/{{name}}",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "删除pod生效时间<10s",
       "type": "stat"
     },
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -407,17 +424,16 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -450,9 +466,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
           "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})/sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"})",
           "interval": "",
           "legendFormat": "",
@@ -460,23 +481,20 @@
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "原地更新的成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -509,33 +527,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\"}) )/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"}) )",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"}) )/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"}) )",
           "interval": "",
           "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "容器被kill或create的成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -568,33 +588,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",action=\"inplaceUpdate\",le=\"10\"})/sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\", status=\"success\",le=\"10\"})/sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})",
           "interval": "",
           "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "更新对象的生效时间<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -627,24 +649,26 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\",le=\"10\"}) )/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\"}) )",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",action=\"inplaceUpdate\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})",
           "interval": "",
           "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "容器被kill或create的延迟<10s",
       "type": "stat"
     },
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -657,17 +681,16 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -700,9 +723,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
           "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"rollingUpdate\",grace=\"true\",status=\"success\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\",status=\"success\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",objectKind=\"GameDeployment\"})/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"rollingUpdate\",grace=\"true\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{objectKind=\"GameDeployment\"})",
           "interval": "",
           "legendFormat": "",
@@ -710,23 +738,20 @@
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "优雅删除或更新的成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -759,33 +784,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",name=~\"$name\",action=~\"predelete|preinplace\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{,name=~\"$name\",objectKind=\"GameDeployment\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",action=~\"predelete|preinplace\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{objectKind=\"GameDeployment\"}) ",
           "interval": "",
           "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "hookrun创建成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -818,33 +845,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",status=\"success\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\"}) ",
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "优雅删除pod的成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -877,33 +906,36 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",status=\"success\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\"})",
           "interval": "",
           "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "优雅更新容器重建的成功率",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
+      "datasource": {},
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -936,33 +968,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
           "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",le=\"10\"} or bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",le=\"10\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",le=\"10\",objectKind=\"GameDeployment\"})/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",objectKind=\"GameDeployment\"})",
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": " {{namespace}}/{{name}}",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "优雅删除或更新的延迟<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -995,33 +1029,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",name=~\"$name\",le=\"10\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",name=~\"$name\",objectKind=\"GameDeployment\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",le=\"10\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",objectKind=\"GameDeployment\"}) ",
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "hookrun创建的延迟<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1054,33 +1090,35 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",name=~\"$name\",le=\"10\"})  / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",le=\"10\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\"}) ",
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "删除pod的延迟<10s",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1113,94 +1151,40 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.4",
+      "pluginVersion": "8.4.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",name=~\"$name\",le=\"10\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\",name=~\"$name\"}) ",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "6kLrfdunz"
+          },
+          "exemplar": true,
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",le=\"10\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\"})",
           "interval": "",
-          "legendFormat": " ",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
       "title": "容器重建的延迟<10s",
       "type": "stat"
     }
   ],
-  "schemaVersion": 26,
+  "refresh": false,
+  "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count)",
-        "error": null,
-        "hide": 0,
-        "includeAll": true,
-        "label": null,
-        "multi": true,
-        "name": "",
-        "options": [],
-        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count)",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
-        "datasource": "prometheus",
-        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{}, name)",
-        "error": null,
-        "hide": 0,
-        "includeAll": true,
-        "label": null,
-        "multi": true,
-        "name": "name",
-        "options": [],
-        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{}, name)",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      }
-    ]
+    "list": []
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2022-05-17T02:07:51.865Z",
+    "to": "2022-05-17T03:27:51.865Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "GameDeployment SLA",
   "uid": "EoSSyQwnz",
-  "version": 35
+  "version": 7,
+  "weekStart": ""
 }
