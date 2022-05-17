@@ -84,7 +84,7 @@
           "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\"} or bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\"})/sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{} or  bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\"})",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -145,10 +145,10 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)/sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{status=\"success\",name=~\"$name\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{,name=~\"$name\"}) ",
           "hide": false,
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -206,10 +206,10 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",name=~\"$name\"}) ",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "refId": "B"
         }
       ],
@@ -267,7 +267,7 @@
         {
           "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",le=\"10\"} or bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{} or bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\"})",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -323,9 +323,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",namespace=~\"$namespace\",name=~\"$name\",le=\"10\"}) by (namespace,name)/sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name) ",
+          "expr": "sum(bkbcs_gamedeployment_pod_create_duration_seconds_bucket{status=\"success\",name=~\"$name\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_create_duration_seconds_count{,name=~\"$name\"})  ",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -381,9 +381,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\",le=\"10\"}) by (namespace,name)/sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{action=\"deletePod\",status=\"success\",name=~\"$name\",le=\"10\"}) /sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"deletePod\",status=\"success\",name=~\"$name\"}) ",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -455,7 +455,7 @@
         {
           "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})/sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"})",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -512,9 +512,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",namespace=~\"$namespace\",name=~\"$name\",action=\"inplaceUpdate\"}) by (namespace,name))/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"}) by (namespace,name))",
+          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\"}) )/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\"}) )",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -573,7 +573,7 @@
         {
           "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",action=\"inplaceUpdate\",le=\"10\"})/sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",action=\"inplaceUpdate\"})",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -630,9 +630,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",namespace=~\"$namespace\",name=~\"$name\",action=\"inplaceUpdate\",le=\"10\"}) by (namespace,name))/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",namespace=~\"$namespace\",name=~\"$name\",action=\"inplaceUpdate\"}) by (namespace,name))",
+          "expr": "(sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\",le=\"10\"}) )/(sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{status=\"success\",name=~\"$name\",action=\"inplaceUpdate\"}) )",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -705,7 +705,7 @@
         {
           "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"rollingUpdate\",grace=\"true\",status=\"success\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\",status=\"success\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",objectKind=\"GameDeployment\"})/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{action=\"rollingUpdate\",grace=\"true\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{objectKind=\"GameDeployment\"})",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -762,9 +762,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",namespace=~\"$namespace\",name=~\"$name\",action=~\"predelete|preinplace\",objectKind=\"GameDeployment\"}) by (namespace,name)/ sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{namespace=~\"$namespace\",name=~\"$name\",objectKind=\"GameDeployment\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{status=\"success\",name=~\"$name\",action=~\"predelete|preinplace\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{,name=~\"$name\",objectKind=\"GameDeployment\"}) ",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -821,9 +821,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -880,9 +880,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)/ sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",status=\"success\",name=~\"$name\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
           "interval": "",
-          "legendFormat": "{{namespace}}/{{name}}",
+          "legendFormat": "",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -941,7 +941,7 @@
         {
           "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",le=\"10\"} or bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",le=\"10\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",le=\"10\",objectKind=\"GameDeployment\"})/ sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\"} or bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\"} or bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",objectKind=\"GameDeployment\"})",
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -998,9 +998,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\",le=\"10\",objectKind=\"GameDeployment\"}) by (namespace,name)/ sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",namespace=~\"$namespace\",name=~\"$name\",objectKind=\"GameDeployment\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gameworkload_hookrun_create_duration_seconds_bucket{action=~\"preinplace|predelete\",status=\"success\",name=~\"$name\",le=\"10\",objectKind=\"GameDeployment\"}) / sum(bkbcs_gameworkload_hookrun_create_duration_seconds_count{action=~\"preinplace|predelete\",name=~\"$name\",objectKind=\"GameDeployment\"}) ",
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -1057,9 +1057,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\",le=\"10\"}) by (namespace,name) / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_delete_duration_seconds_bucket{grace=\"true\",status=\"success\",name=~\"$name\",le=\"10\"})  / sum(bkbcs_gamedeployment_pod_delete_duration_seconds_count{grace=\"true\",name=~\"$name\"}) ",
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -1116,9 +1116,9 @@
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",namespace=~\"$namespace\",name=~\"$name\",le=\"10\"}) by (namespace,name)/ sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\",namespace=~\"$namespace\",name=~\"$name\"}) by (namespace,name)",
+          "expr": "sum(bkbcs_gamedeployment_pod_update_duration_seconds_bucket{action=\"inplaceUpdate\",grace=\"true\",status=\"success\",name=~\"$name\",le=\"10\"}) / sum(bkbcs_gamedeployment_pod_update_duration_seconds_count{action=\"inplaceUpdate\",grace=\"true\",name=~\"$name\"}) ",
           "interval": "",
-          "legendFormat": " {{namespace}}/{{name}}",
+          "legendFormat": " ",
           "queryType": "randomWalk",
           "refId": "A"
         }
@@ -1146,15 +1146,15 @@
           ]
         },
         "datasource": "prometheus",
-        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count, namespace)",
+        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count)",
         "error": null,
         "hide": 0,
         "includeAll": true,
         "label": null,
         "multi": true,
-        "name": "namespace",
+        "name": "",
         "options": [],
-        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count, namespace)",
+        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1173,7 +1173,7 @@
           "value": "$__all"
         },
         "datasource": "prometheus",
-        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{namespace=~\"$namespace\"}, name)",
+        "definition": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{}, name)",
         "error": null,
         "hide": 0,
         "includeAll": true,
@@ -1181,7 +1181,7 @@
         "multi": true,
         "name": "name",
         "options": [],
-        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{namespace=~\"$namespace\"}, name)",
+        "query": "label_values(bkbcs_gamedeployment_reconcile_duration_seconds_count{}, name)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
