@@ -90,73 +90,38 @@ func (r *HookRelease) ResType() string {
 }
 
 // ValidateCreate validate hook is valid or not when create it.
-//func (s HookRelease) ValidateCreate() error {
-//
-//	if s.ID > 0 {
-//		return errors.New("id should not be set")
-//	}
-//
-//	if s.Spec == nil {
-//		return errors.New("spec not set")
-//	}
-//
-//	if err := s.Spec.ValidateCreate(); err != nil {
-//		return err
-//	}
-//
-//	if s.Attachment == nil {
-//		return errors.New("attachment not set")
-//	}
-//
-//	if err := s.Attachment.Validate(); err != nil {
-//		return err
-//	}
-//
-//	if s.Revision == nil {
-//		return errors.New("revision not set")
-//	}
-//
-//	if err := s.Revision.ValidateCreate(); err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
+func (r *HookRelease) ValidateCreate() error {
 
-// ValidateHookContentSecurity validate security of hook content
-//func (s HookSpec) ValidateHookContentSecurity() error {
-//	if s.PreHook != "" {
-//		switch s.Type {
-//		case Shell:
-//			if err := s.ValidateShellHookSecurity(s.PreHook); err != nil {
-//				return err
-//			}
-//		case Python:
-//			if err := s.ValidatePythonHookSecurity(s.PreHook); err != nil {
-//				return err
-//			}
-//		case "":
-//			return fmt.Errorf("pre hook must set a hook type")
-//		}
-//	}
-//
-//	if s.PostHook != "" {
-//		switch s.PostType {
-//		case Shell:
-//			if err := s.ValidateShellHookSecurity(s.PostHook); err != nil {
-//				return err
-//			}
-//		case Python:
-//			if err := s.ValidatePythonHookSecurity(s.PostHook); err != nil {
-//				return err
-//			}
-//		case "":
-//			return fmt.Errorf("post hook must set a hook type")
-//		}
-//	}
-//
-//	return nil
-//}
+	if r.ID > 0 {
+		return errors.New("id should not be set")
+	}
+
+	if r.Spec == nil {
+		return errors.New("spec not set")
+	}
+
+	//if err := r.Spec.ValidateCreate(); err != nil {
+	//	return err
+	//}
+
+	if r.Attachment == nil {
+		return errors.New("attachment not set")
+	}
+
+	//if err := r.Attachment.Validate(); err != nil {
+	//	return err
+	//}
+
+	if r.Revision == nil {
+		return errors.New("revision not set")
+	}
+
+	if err := r.Revision.ValidateCreate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // ValidateDelete validate the hook release info when delete it.
 func (r HookRelease) ValidateDelete() error {

@@ -149,7 +149,6 @@ func (dao *hookReleaseDao) Delete(kit *kit.Kit, g *table.HookRelease) error {
 
 func (dao *hookReleaseDao) Publish(kit *kit.Kit, g *table.HookRelease) error {
 
-	// TODO 参数校验
 	if err := g.ValidatePublish(); err != nil {
 		return err
 	}
