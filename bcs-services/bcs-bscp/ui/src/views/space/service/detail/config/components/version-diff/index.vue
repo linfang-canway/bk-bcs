@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { guardReactiveProps, ref, watch } from 'vue'
+  import { ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { PlayShape } from 'bkui-vue/lib/icon'
   import { IConfigVersion, IConfigListQueryParams, IConfigDiffDetail, IConfigDetail, IConfigItem } from '../../../../../../../../types/config'
@@ -334,7 +334,7 @@
     }
   }
   .diff-content-area {
-    flex: 1;
+    width: calc(100% - 264px);
     height: 100%;
   }
   .diff-panel-head {

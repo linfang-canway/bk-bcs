@@ -32,6 +32,10 @@
   const groups = ref<IGroupToPublish[]>([])
   const baseVersionId = ref(0)
 
+  const handleOpenSelectGroupPanel = () => {
+    openSelectGroupPanel.value = true
+  }
+
   const handleOpenPublishDialog = () => {
     if (groups.value.length === 0) {
       BkMessage({ theme: 'error', message: '请选择上线分组' })
@@ -46,17 +50,16 @@
     isDiffSliderShow.value = true
   }
 
+  // 版本上线成功
   const handleConfirm = () => {
     isDiffSliderShow.value = false
     handlePanelClose()
+    emit('confirm')
     InfoBox({
     // @ts-ignore
       infoType: "success",
       title: '版本已上线',
-      dialogType: 'confirm',
-      onConfirm () {
-        emit('confirm')
-      }
+      dialogType: 'confirm'
     })
   }
 
@@ -65,10 +68,14 @@
     groups.value = []
   }
 
+  defineExpose({
+    handleOpenSelectGroupPanel
+  })
+
 </script>
 <template>
     <section class="create-version">
-        <bk-button theme="primary" @click="openSelectGroupPanel = true">上线版本</bk-button>
+        <bk-button v-if="versionData.status.publish_status === 'not_released'" class="trigger-button" theme="primary" @click="handleOpenSelectGroupPanel">上线版本</bk-button>
         <VersionLayout v-if="openSelectGroupPanel">
             <template #header>
                 <section class="header-wrapper">
@@ -104,6 +111,9 @@
     </section>
 </template>
 <style lang="scss" scoped>
+    .trigger-button {
+      margin-left: 8px;
+    }
     .header-wrapper {
         display: flex;
         align-items: center;

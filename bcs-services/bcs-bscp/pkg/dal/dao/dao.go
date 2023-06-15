@@ -16,8 +16,15 @@ package dao
 import (
 	"fmt"
 
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/plugin/opentelemetry/tracing"
+	"gorm.io/plugin/prometheus"
+
 	"bscp.io/pkg/cc"
 	"bscp.io/pkg/criteria/errf"
+	"bscp.io/pkg/dal/gen"
 	"bscp.io/pkg/dal/orm"
 	"bscp.io/pkg/dal/sharding"
 	"bscp.io/pkg/kit"
@@ -25,6 +32,7 @@ import (
 
 // Set defines all the DAO to be operated.
 type Set interface {
+	GenQuery() *gen.Query
 	ID() IDGenInterface
 	App() App
 	Commit() Commit
@@ -36,6 +44,8 @@ type Set interface {
 	CRInstance() CRInstance
 	Strategy() Strategy
 	Hook() Hook
+	HookRelease() HookRelease
+	TemplateSpace() TemplateSpace
 	Group() Group
 	GroupAppBind() GroupAppBind
 	ReleasedGroup() ReleasedGroup
@@ -46,6 +56,7 @@ type Set interface {
 	Healthz() error
 	Credential() Credential
 	CredentialScope() CredentialScope
+	ConfigHook() ConfigHook
 }
 
 // NewDaoSet create the DAO set instance.
@@ -56,15 +67,47 @@ func NewDaoSet(opt cc.Sharding, credentialSetting cc.Credential) (Set, error) {
 		return nil, fmt.Errorf("init sharding failed, err: %v", err)
 	}
 
+	adminDB, err := gorm.Open(mysql.Open(sharding.URI(opt.AdminDatabase)), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	if err != nil {
+		return nil, err
+	}
+
+	if e := adminDB.Use(tracing.NewPlugin(tracing.WithoutMetrics())); e != nil {
+		return nil, err
+	}
+
+	// 会定期执行 SHOW STATUS; 拿状态数据
+	// metricsCollector := []prometheus.MetricsCollector{
+	// 	&prometheus.MySQL{VariableNames: []string{"Threads_running"}},
+	// }
+
+	if e := adminDB.Use(prometheus.New(prometheus.Config{})); e != nil {
+		return nil, err
+	}
+
+	// auditor 分库, 注意需要在分表前面
+	// auditorDB := sharding.MustShardingAuditor(adminDB)
+
+	// biz 分表 mysql.Dialector -> sharding.ShardingDialector
+	// 不支持 sqlparser.QualifiedRef, 暂时去掉, 参考 issue https://github.com/go-gorm/sharding/pull/32
+	// if err := sharding.InitBizSharding(adminDB); err != nil {
+	// 	return nil, err
+	// }
+
+	// 初始化 Gen 配置
+	genQ := gen.Use(adminDB)
+
 	ormInst := orm.Do(opt)
-	idDao := &idGenerator{sd: sd}
-	auditDao, err := NewAuditDao(ormInst, sd, idDao)
+	idDao := &idGenerator{sd: sd, genQ: genQ}
+	auditDao, err := NewAuditDao(adminDB, ormInst, sd, idDao)
 	if err != nil {
 		return nil, fmt.Errorf("new audit dao failed, err: %v", err)
 	}
 
 	s := &set{
 		orm:               ormInst,
+		db:                adminDB,
+		genQ:              genQ,
 		sd:                sd,
 		credentialSetting: credentialSetting,
 		idGen:             idDao,
@@ -78,12 +121,19 @@ func NewDaoSet(opt cc.Sharding, credentialSetting cc.Credential) (Set, error) {
 
 type set struct {
 	orm               orm.Interface
+	genQ              *gen.Query
+	db                *gorm.DB
 	sd                *sharding.Sharding
 	credentialSetting cc.Credential
 	idGen             IDGenInterface
 	auditDao          AuditDao
 	event             Event
 	lock              LockDao
+}
+
+// GenQuery returns the gen Query object
+func (s *set) GenQuery() *gen.Query {
+	return s.genQ
 }
 
 // ID returns the resource id generator DAO
@@ -137,6 +187,7 @@ func (s *set) Content() Content {
 func (s *set) Release() Release {
 	return &releaseDao{
 		orm:      s.orm,
+		genQ:     s.genQ,
 		sd:       s.sd,
 		idGen:    s.idGen,
 		auditDao: s.auditDao,
@@ -188,13 +239,30 @@ func (s *set) Strategy() Strategy {
 	}
 }
 
-// Hook returns the group's DAO
+// Hook returns the hook's DAO
 func (s *set) Hook() Hook {
 	return &hookDao{
-		orm:      s.orm,
-		sd:       s.sd,
 		idGen:    s.idGen,
 		auditDao: s.auditDao,
+		genQ:     s.genQ,
+	}
+}
+
+// HookRelease returns the hookRelease's DAO
+func (s *set) HookRelease() HookRelease {
+	return &hookReleaseDao{
+		idGen:    s.idGen,
+		auditDao: s.auditDao,
+		genQ:     s.genQ,
+	}
+}
+
+// TemplateSpace returns the templateSpace's DAO
+func (s *set) TemplateSpace() TemplateSpace {
+	return &templateSpaceDao{
+		idGen:    s.idGen,
+		auditDao: s.auditDao,
+		genQ:     s.genQ,
 	}
 }
 
@@ -294,6 +362,15 @@ func (s *set) CredentialScope() CredentialScope {
 	return &credentialScopeDao{
 		orm:      s.orm,
 		sd:       s.sd,
+		idGen:    s.idGen,
+		auditDao: s.auditDao,
+	}
+}
+
+// ConfigHook returns the configHook's DAO
+func (s *set) ConfigHook() ConfigHook {
+	return &configHookDao{
+		genQ:     s.genQ,
 		idGen:    s.idGen,
 		auditDao: s.auditDao,
 	}

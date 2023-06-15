@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, watch, onMounted } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useConfigStore } from '../../../../../../store/config'
   import { IConfigItem, IConfigListQueryParams } from '../../../../../../../types/config'
@@ -19,6 +19,10 @@
   const configList = ref<Array<IConfigItem>>([])
   const configId = ref(0)
   const editDialogShow = ref(false)
+
+  watch(() => versionData.value.id, () => {
+    getListData()
+  })
 
   onMounted(() => {
     getListData()
@@ -57,13 +61,13 @@
 <template>
   <section class="current-config-list">
     <bk-loading :loading="loading">
-      <h4 class="version-name">{{ versionData.spec.name }}</h4>
-      <div class="config-list-wrapper">
+      <div v-if="configList.length > 0" class="config-list-wrapper">
         <div v-for="config in configList" class="config-item" :key="config.id" @click="handleEditConfigOpen(config.id)">
           <div class="config-name">{{ config.spec.name }}</div>
           <div class="config-type">{{ getConfigTypeName(config.spec.file_type) }}</div>
         </div>
       </div>
+      <bk-exception v-else scene="part" type="empty" description="暂无数据"></bk-exception>
     </bk-loading>
     <EditConfig
       v-model:show="editDialogShow"
@@ -77,13 +81,7 @@
     padding: 24px;
     height: 100%;
     background: #fafbfd;
-  }
-  .version-name {
-    margin: 0 0 16px 0;
-    height: 19px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #63656e;
+    overflow: auto;
   }
   .config-item {
     display: flex;

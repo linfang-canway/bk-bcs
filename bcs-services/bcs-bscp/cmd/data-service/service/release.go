@@ -14,10 +14,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	pbstruct "github.com/golang/protobuf/ptypes/struct"
+	"gorm.io/gorm"
 
 	"bscp.io/pkg/dal/table"
 	"bscp.io/pkg/kit"
@@ -40,6 +42,10 @@ func (s *Service) CreateRelease(ctx context.Context, req *pbds.CreateReleaseReq)
 	if err != nil {
 		logs.Errorf("query app config item list failed, err: %v, rid: %s", err, grpcKit.Rid)
 		return nil, err
+	}
+	// if no config item, return directly.
+	if len(cfgItems) == 0 {
+		return nil, errors.New("app config items is empty")
 	}
 
 	// step2: query config item newest commit
@@ -71,6 +77,21 @@ func (s *Service) CreateRelease(ctx context.Context, req *pbds.CreateReleaseReq)
 		return nil, err
 	}
 	// step4: create release, and create release and released config item need to begin tx.
+	hook, err := s.dao.ConfigHook().GetByAppID(grpcKit, req.Attachment.BizId, req.Attachment.AppId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		logs.Errorf("get configHook failed, err: %v, rid: %s", err, grpcKit.Rid)
+		return nil, err
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+
+		req.Spec.Hook = &pbrelease.Hook{
+			PreHookId:         hook.Spec.PreHookID,
+			PreHookReleaseId:  hook.Spec.PreHookReleaseID,
+			PostHookId:        hook.Spec.PostHookID,
+			PostHookReleaseId: hook.Spec.PostHookReleaseID,
+		}
+	}
+
 	release := &table.Release{
 		Spec:       req.Spec.ReleaseSpec(),
 		Attachment: req.Attachment.ReleaseAttachment(),
@@ -236,7 +257,6 @@ func (s *Service) queryPublishStatus(gcrs []*table.ReleasedGroup, releaseID uint
 	} else if includeDefault {
 		return table.FullReleased.String(), inRelease
 		// len(inRelease) != 0 && len(outRelease) == 0 && !includeDefault: gray released
-	} else {
-		return table.PartialReleased.String(), inRelease
 	}
+	return table.PartialReleased.String(), inRelease
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { ArrowsLeft, AngleRight } from 'bkui-vue/lib/icon'
   import InfoBox from 'bkui-vue/lib/info-box';
   import BkMessage from 'bkui-vue/lib/message';
@@ -31,6 +31,10 @@
   const isConfirmDialogShow = ref(false)
   const groups = ref<IGroupToPublish[]>([])
   const baseVersionId = ref(0)
+
+  const currentSelectedGroups = computed(() => {
+    return versionData.value.status.released_groups.map(group => group.id)
+  })
 
 // 打开选择分组面板
   const handleOpenSelectGroupPanel = () => {
@@ -69,14 +73,12 @@
   const handleConfirm = () => {
     isDiffSliderShow.value = false
     handlePanelClose()
+    emit('confirm')
     InfoBox({
     // @ts-ignore
       infoType: "success",
-      title: '版本已上线',
-      dialogType: 'confirm',
-      onConfirm () {
-        emit('confirm')
-      }
+      title: '调整分组上线成功',
+      dialogType: 'confirm'
     })
   }
 
@@ -89,7 +91,7 @@
 </script>
 <template>
     <section class="create-version">
-        <bk-button theme="primary" @click="handleOpenSelectGroupPanel">调整分组上线</bk-button>
+        <bk-button v-if="versionData.status.publish_status === 'partial_released'" theme="primary" @click="handleOpenSelectGroupPanel">调整分组上线</bk-button>
         <VersionLayout v-if="openSelectGroupPanel">
             <template #header>
                 <section class="header-wrapper">
@@ -101,7 +103,12 @@
                     调整分组上线：{{ versionData.spec.name }}
                 </section>
             </template>
-            <select-group :groups="groups" @openPreviewVersionDiff="openPreviewVersionDiff" @change="groups = $event"></select-group>
+            <select-group
+              :groups="groups"
+              :disabled="currentSelectedGroups"
+              @openPreviewVersionDiff="openPreviewVersionDiff"
+              @change="groups = $event">
+            </select-group>
             <template #footer>
                 <section class="actions-wrapper">
                     <bk-button class="publish-btn" theme="primary" @click="isDiffSliderShow = true">对比并上线</bk-button>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+  import { ref, computed, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
+  import { AngleDown } from 'bkui-vue/lib/icon'
   import { useGlobalStore } from '../store/global'
   import { useUserStore } from '../store/user'
   import { ISpaceDetail } from '../../types/index'
@@ -13,9 +15,35 @@
   const navList = [
     { id: 'service-mine', module: 'service', name: '服务管理'},
     { id: 'groups-management', module: 'groups', name: '分组管理'},
-    // { id: 'scripts-management', module: 'scripts', name: '脚本管理'},
+    { id: 'script-list', module: 'scripts', name: '脚本管理'},
     { id: 'credentials-management', module: 'credentials', name: '服务密钥'}
   ]
+
+  const optionList = ref<ISpaceDetail[]>([])
+
+  const crtSpaceText = computed(() => {
+    const space = spaceList.value.find(item => item.space_id === spaceId.value)
+    if (space) {
+      return `${space.space_name}(${spaceId.value})`
+    }
+    return ''
+  })
+
+  watch(spaceList, (val) => {
+    optionList.value = val.slice()
+  }, {
+    immediate: true
+  })
+
+  const handleSpaceSearch = (searchStr: string) => {
+    if (searchStr) {
+      optionList.value = spaceList.value.filter(item => {
+        return item.space_name.toLowerCase().includes(searchStr.toLowerCase()) || String(item.space_id).includes(searchStr)
+    })
+    } else {
+      optionList.value = spaceList.value.slice()
+    }
+  }
 
   const handleSelectSpace = (id: string) => {
     const space = spaceList.value.find((item: ISpaceDetail) => item.space_id === id)
@@ -66,10 +94,21 @@
         :popover-options="{ theme: 'light bk-select-popover space-selector-popover' }"
         :filterable="true"
         :clearable="false"
+        :input-search="false"
+        :remote-method="handleSpaceSearch"
         @change="handleSelectSpace">
-        <bk-option v-for="item in spaceList" :key="item.space_id" :value="item.space_id" :label="item.space_name">
+        <template #trigger>
+          <div class="space-name">
+            <input readonly :value="crtSpaceText">
+            <AngleDown class="arrow-icon" />
+          </div>
+        </template>
+        <bk-option v-for="item in optionList" :key="item.space_id" :value="item.space_id" :label="item.space_name">
           <div v-cursor="{ active: !item.permission }" :class="['biz-option-item', { 'no-perm': !item.permission }]">
-            <div class="name">{{ item.space_name }}</div>
+            <div class="name-wrapper">
+              <span class="text">{{ item.space_name }}</span>
+              <span class="id">({{ item.space_id }})</span>
+            </div>
             <span class="tag">{{ item.space_type_name }}</span>
           </div>
         </bk-option>
@@ -130,13 +169,33 @@
 .space-selector {
   margin-right: 24px;
   width: 240px;
-  :deep(.bk-select-trigger) {
-    .bk-input--default {
-      border: none;
+  &.popover-show {
+    .space-name .arrow-icon {
+      transform: rotate(-180deg);
     }
-    .bk-input--text {
+  }
+  .space-name {
+    position: relative;
+    input {
+      padding: 0 24px 0 10px;
+      width: 100%;
+      line-height: 32px;
+      font-size: 12px;
+      border: none;
+      outline: none;
       background: #303d55;
+      border-radius: 2px;
       color: #d3d9e4;
+      cursor: pointer;
+    }
+    .arrow-icon {
+      position: absolute;
+      top: 0;
+      right: 4px;
+      height: 100%;
+      font-size: 20px;
+      color: #979ba5;
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
     }
   }
 }
@@ -146,27 +205,34 @@
   &.no-perm {
     background-color: #fafafa !important;
     color: #cccccc !important;
-    .tag {
-      border-color: #e6e6e6 !important;
-      color: #cccccc !important;
-    }
   }
-  .name {
+  .name-wrapper {
     padding-right: 30px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    .text {
+      flex: 0 1 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .id {
+      flex: 0 0 auto;
+      margin-left: 4px;
+      color: #979ba5;
+    }
   }
   .tag {
     position: absolute;
-    top: 10px;
-    right: 8px;
+    top: 8px;
+    right: 4px;
     padding: 2px;
     font-size: 12px;
     line-height: 1;
-    color: #3a84ff;
-    border: 1px solid #3a84ff;
+    color: #cccccc;
+    border: 1px solid #cccccc;
     border-radius: 2px;
+    transform: scale(0.8);
   }
 }
 </style>

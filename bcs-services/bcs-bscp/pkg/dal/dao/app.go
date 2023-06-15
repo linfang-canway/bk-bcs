@@ -13,6 +13,7 @@ limitations under the License.
 package dao
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"strconv"
@@ -39,9 +40,9 @@ type App interface {
 	// Update one app's info
 	Update(kit *kit.Kit, app *table.App) error
 	// get app with id.
-	Get(kit *kit.Kit, BizID, AppID uint32) (*table.App, error)
+	Get(kit *kit.Kit, bizID, appID uint32) (*table.App, error)
 	// get app only with id.
-	GetByID(kit *kit.Kit, AppID uint32) (*table.App, error)
+	GetByID(kit *kit.Kit, appID uint32) (*table.App, error)
 	// get app by name.
 	GetByName(kit *kit.Kit, bizID uint32, name string) (*table.App, error)
 	// List apps with options.
@@ -151,12 +152,14 @@ func (ap *appDao) ListAppsByGroupID(kit *kit.Kit, groupID, bizID uint32) ([]*tab
 	}
 
 	group := &table.Group{}
-	var getGroupSqlSentence []string
-	getGroupSqlSentence = append(getGroupSqlSentence, "SELECT ", table.GroupColumns.NamedExpr(),
-		" FROM "+table.GroupTable.Name()+fmt.Sprintf(" WHERE biz_id = %d AND id = %d", bizID, groupID))
-	getGroupSql := filter.SqlJoint(getGroupSqlSentence)
+	var sqlBuf bytes.Buffer
+	sqlBuf.WriteString("SELECT ")
+	sqlBuf.WriteString(table.GroupColumns.NamedExpr())
+	sqlBuf.WriteString(" FROM ")
+	sqlBuf.WriteString(table.GroupTable.Name())
+	sqlBuf.WriteString(" WHERE biz_id = ? AND id = ?")
 
-	err := ap.orm.Do(ap.sd.ShardingOne(bizID).DB()).Get(kit.Ctx, group, getGroupSql)
+	err := ap.orm.Do(ap.sd.ShardingOne(bizID).DB()).Get(kit.Ctx, group, sqlBuf.String(), bizID, groupID)
 	if err != nil {
 		return nil, err
 	}

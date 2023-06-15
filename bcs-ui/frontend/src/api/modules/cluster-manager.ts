@@ -45,6 +45,7 @@ export const cloudRegionByAccount = request('get', '/clouds/$cloudId/regions');
 export const cloudClusterList = request('get', '/clouds/$cloudId/clusters');
 export const taskRetry = request('put', '/task/$taskId/retry');
 export const cloudDetail = request('get', '/cloud/$cloudId');
+export const cloudNodes = request('get', '/clouds/$cloudId/instances');
 
 // node 操作
 export const getK8sNodes = request('get', '/cluster/$clusterId/node');
@@ -62,3 +63,4 @@ export const newUserPermsByAction = request('post', '/perms/actions/$actionId');
 
 // CA
 export const clusterAutoScalingLogsV2 = request('get', '/operationlogs');
+export const cloudsZones = request('get', '/clouds/$cloudId/zones');

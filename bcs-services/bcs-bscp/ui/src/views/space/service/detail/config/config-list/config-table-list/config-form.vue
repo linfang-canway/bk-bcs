@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, withDefaults, computed, watch } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import SHA256 from 'crypto-js/sha256'
   import WordArray from 'crypto-js/lib-typedarrays'
   import { TextFill, Done } from 'bkui-vue/lib/icon'
@@ -9,7 +9,7 @@
   import { updateConfigContent, getConfigContent } from '../../../../../../../api/config'
   import { stringLengthInBytes } from '../../../../../../../utils/index'
   import { transFileToObject, fileDownload } from '../../../../../../../utils/file'
-  import { CONFIG_FILE_TYPE } from '../../../../../../../constants/index'
+  import { CONFIG_FILE_TYPE } from '../../../../../../../constants/config'
   import ConfigContentEditor from '../../components/config-content-editor.vue'
 
   const props = withDefaults(defineProps<{
@@ -40,9 +40,9 @@
       },
       {
         validator: (value: string) => {
-          return /^[a-zA-Z0-9][a-zA-Z0-9_\-\.]*[a-zA-Z0-9]?$/.test(value)
+          return /^[a-zA-Z0-9_\-\.]+$/.test(value)
         },
-        message: '请使用英文、数字、下划线、中划线、点，且必须以英文、数字开头和结尾'
+        message: '请使用英文、数字、下划线、中划线或点'
       }
     ],
     path: [
@@ -89,12 +89,12 @@
           return
         }
       } else if (localVal.value.file_type === 'text') {
-        if (stringLengthInBytes(stringContent.value) > 1024 * 1024 * 100 ) {
-          BkMessage({ theme: 'error', message: '配置内容不能超过100M' })
+        if (stringLengthInBytes(stringContent.value) > 1024 * 1024 * 40 ) {
+          BkMessage({ theme: 'error', message: '配置内容不能超过40M' })
           return
         }
       }
-      
+
       submitPending.value = true
       let sign = await generateSHA256()
       let size = 0
@@ -120,7 +120,7 @@
   // 上传配置内容
   const uploadContent =  async () => {
     const SHA256Str = await generateSHA256()
-    const data = localVal.value.file_type === 'binary' ? fileContent.value : stringContent.value
+    const data = localVal.value.file_type === 'binary' ? fileContent.value : JSON.stringify(stringContent.value)
     // @ts-ignore
     return updateConfigContent(props.bkBizId, props.appId, data, SHA256Str)
   }
@@ -141,7 +141,7 @@
       }
       return (fileContent.value as IFileConfigContentSummary).signature
     }
-    return SHA256(stringContent.value).toString()
+    return SHA256(JSON.stringify(stringContent.value)).toString()
   }
 
   // 下载已上传文件
@@ -186,7 +186,8 @@
             class="config-uploader"
             url=""
             theme="button"
-            tip="支持扩展名：.bin"
+            tip="支持扩展名：.bin，文件大小100M以内"
+            :size="100"
             :disabled="!editable"
             :multiple="false"
             :files="fileList"
@@ -227,6 +228,9 @@
     :deep(.bk-upload-list__item) {
       padding: 0;
       border: none;
+    }
+    :deep(.bk-upload-list--disabled .bk-upload-list__item) {
+      pointer-events: inherit;
     }
     .file-wrapper {
       display: flex;
