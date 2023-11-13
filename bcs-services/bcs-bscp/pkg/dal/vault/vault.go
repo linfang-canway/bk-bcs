@@ -35,6 +35,8 @@ type Set interface {
 	GetKvByVersion(kit *kit.Kit, opt *types.GetKvByVersion) (kvType types.KvType, value string, err error)
 	// DeleteKv deletes specified key-value data from Vault.
 	DeleteKv(kit *kit.Kit, opt *types.DeleteKvOpt) error
+	// CreateReleasedKv create released kv
+	CreateReleasedKv(kit *kit.Kit, opt *types.CreateReleasedKvOption) (int, error)
 }
 
 type set struct {

@@ -255,3 +255,41 @@ func (opt *ListKvOption) Validate(po *PageOption) error {
 
 	return nil
 }
+
+type CreateReleasedKvOption struct {
+	BizID     uint32
+	AppID     uint32
+	ReleaseID uint32
+	Key       string
+	Value     string
+	KvType    KvType
+}
+
+// Validate is used to validate the effectiveness of the CreateReleasedKvOption structure.
+func (o *CreateReleasedKvOption) Validate() error {
+	if o.BizID <= 0 {
+		return errors.New("invalid biz id, should >= 1")
+	}
+
+	if o.AppID <= 0 {
+		return errors.New("invalid app id, should >= 1")
+	}
+
+	if o.ReleaseID <= 0 {
+		return errors.New("invalid revision id, should >= 1")
+	}
+
+	if o.Key == "" {
+		return errors.New("kv key is required")
+	}
+
+	if o.Value == "" {
+		return errors.New("kv value is required")
+	}
+
+	if err := o.KvType.ValidateValue(o.Value); err != nil {
+		return err
+	}
+
+	return nil
+}
